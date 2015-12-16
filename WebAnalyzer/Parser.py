@@ -50,7 +50,7 @@ class MyClass(object):
 		if(data_key=="updates"):
 			payload = {'offset':''+str(size)}
 		r = requests.get('http://www.idea.me/projects/'+str(projectnr)+'/'+data_key,headers=headers,params=payload)
-		print(r.url)
+		#print(r.url)
 		return r.json()
        
         
@@ -121,7 +121,7 @@ class MyClass(object):
 		#updates=(self.get_json_data(projectnr, int_size, "updates"))
 		date_counter={}
 		for update in updates:
-			print(update)
+			#print(update)
 			try:
 				key=update['updateDate'][:10].replace("-","/")
 			
