@@ -135,16 +135,24 @@ class MyClass(object):
 	def get_html_data(self,url):
 		return self.getPage(url)
 	def get_fb_likes(self,url):
-		fb_url="http://www.idea.me"+url
-		fb_url=fb_url.replace(":","%3A")
-		fb_url=fb_url.replace("/","%2F")
-		
+		fb_url=self.to_fb_url(url)
 		r_likes=requests.get("https://www.facebook.com/plugins/like.php?action=like&app_id=1549005192016984&channel=http%3A%2F%2Fstatic.ak.facebook.com%2Fconnect%2Fxd_arbiter.php%3Fversion%3D42%23cb%3Df82b413c%26domain%3Dwww.idea.me%26origin%3Dhttp%253A%252F%252Fwww.idea.me%252Ff26572cf1%26relation%3Dparent.parent&container_width=82&href="+fb_url+"&layout=button_count&locale=en_US&sdk=joey&send=false&show_faces=false")
 		match=re.search('pluginCountTextConnected">([0-9.k]+)', r_likes.text)
 		return match.group(1)
 		#print(html)
-test=MyClass()
-#test.parse_updates("30407")
+		
+	def get_fb_comments(self,url):
+		fb_url=self.to_fb_url(url)
+		r_comments=requests.get("https://www.facebook.com/plugins/comments.php?api_key=1549005192016984&channel_url=http%3A%2F%2Fstaticxx.facebook.com%2Fconnect%2Fxd_arbiter.php%3Fversion%3D42%23cb%3Df2c8ee4c0%26domain%3Dwww.idea.me%26origin%3Dhttp%253A%252F%252Fwww.idea.me%252Ff1900a81fc%26relation%3Dparent.parent&href="+fb_url+"&locale=en_US&numposts=10&sdk=joey&width=650")
+		return r_comments
+		#match=re.search(pattern, r_comments.text)
+	def to_fb_url(self,url):
+		fb_url="http://www.idea.me"+url
+		fb_url=fb_url.replace(":","%3A")
+		fb_url=fb_url.replace("/","%2F")
+		return fb_url
+	
+
 #html_data1=test.get_html_data("http://www.idea.me/projects/34728/muertos-de-amor-y-de-miedo")
 #html_data2=test.get_html_data("http://www.idea.me/proyectos/20903/hoysalimos")
 #test.parse_project_page('http://www.idea.me/projects/34728/muertos-de-amor-y-de-miedo')

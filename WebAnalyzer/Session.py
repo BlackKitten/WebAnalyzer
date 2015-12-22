@@ -158,9 +158,12 @@ dataset['backers']=[]
 
 try:
     while(True):
-        
-        ds=get_data_set(i)
-       
+        try:
+            ds=get_data_set(i)
+        except requests.exceptions.ConnectionError:
+            print("ConnectionError @ "+i)
+            i=i+1
+            ds=get_data_set(i)
         dataset['main'].append(ds['main'])
         dataset['updates'].append(ds['updates'])
         dataset['backers'].append(ds['backers'])
