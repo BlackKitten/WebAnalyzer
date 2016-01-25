@@ -76,6 +76,8 @@ class Campaign(threading.Thread):
                 r=random.random()*500
                 print(str(self.threadID)+": campaign.sleep "+str(r))
                 time.sleep(random.random()*500)
+            except(IndexError):
+                self.status="empty"
             cnt=cnt+1
             if(cnt==100):
                 self.status="Failed on Time-out"

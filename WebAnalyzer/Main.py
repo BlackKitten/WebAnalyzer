@@ -7,6 +7,8 @@ import csv
 import requests
 import time
 from Campaign import Campaign
+
+
 if __name__ == '__main__':
     print("main")
 
@@ -32,7 +34,7 @@ def putLabels(dataset):
                 except TypeError:
                     if not(column[0] in labels):
                         labels.append(column[0])
-
+        return labels
 def printToFile(dataset,labels,fn):
     #json_data = getPage(i)
     #parser=MyClass()
@@ -88,38 +90,83 @@ dataset['backers']=[]
 
 threads = []
 #try:
-while(i<2000):
-    d_class=Campaign(i)
-    threads.append(d_class)
+
+
+
     
-    ds=d_class.start()
-    time.sleep(0.5)
-    i=i+1
-    print(i)
-    #cnt=False
-    if(i % 50 == 49):
-        #while(not cnt):
-        #cnt=True
-        for thread in threads:
-            if(thread.status=="started"):
-                print("sleeping on thread:"+ str(thread.threadID))
-                wi=0
-                while(thread.status=="started"):
-                    wi=wi+1
-                    time.sleep(1)
-                    if(wi>5):
-                        print("timeout waiting on thread "+str(thread.threadID))
-                        break
-                    #cnt=False
+threadQ={}
+for ir in range(80):
+    threadQ[str(ir)]="null"
+    
+finished=False
+
+campaign_number=1
+
+
+while(not finished):
+    found_spot=False
+    for k in threadQ:
+        if(threadQ[k] == "null"):
+            found_spot=True
+            threadQ[k]=Campaign(campaign_number)
+            threadQ[k].start()
+            time.sleep(0.5)
+            break
+        status=threadQ[k].status
+        if(status=="success"):
+            found_spot=True
+            threads.append(threadQ[k])
+            threadQ[k]=Campaign(campaign_number)
+            threadQ[k].start()
+            break
+        if(status =="empty"):
+            finished=True
+            for ki in threadQ:
+                threads.append(threadQ[ki])
+            break
+        if(status=="ConnectionError"):
+            threadQ[k]=Campaign(threadQ[k].threadID)
+            threadQ[k].start()
+    if(found_spot):
+        campaign_number=campaign_number+1
+    else:
+        time.sleep(0.5)
+# while(i<2000):
+#     d_class=Campaign(i)
+#     threads.append(d_class)
+#     
+#     ds=d_class.start()
+#     time.sleep(0.5)
+#     i=i+1
+#     print(i)
+#  
+#     if(i % 50 == 49):
+#        
+#         for thread in threads:
+#             if(thread.status=="started"):
+#                 print("sleeping on thread:"+ str(thread.threadID))
+#                 wi=0
+#                 while(thread.status=="started"):
+#                     wi=wi+1
+#                     time.sleep(1)
+#                     if(wi>5):
+#                         print("timeout waiting on thread "+str(thread.threadID))
+#                         break
+#                    
                     
 # except Exception:
 #     print("Exception")
    
+time.sleep(60)
 for thread in threads:
+    i=0
     while(thread.status=="started"):
-        print("sleeping")
-        time.sleep(1)
+        if(i==5):
+            break
+        print("sleeping on "+str(thread.threadID))
+        time.sleep(5)
         print("waking up")
+        i=i+1
     if(thread.status=="success"):
         dataset['main'].append(thread.ds['main'])
         dataset['updates'].append(thread.ds['updates'])
